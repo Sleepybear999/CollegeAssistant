@@ -9,7 +9,7 @@ assert len(rows) == len(vecs), "chunks and vectors are out of sync"
 
 embedder = TextEmbedding("BAAI/bge-small-en-v1.5")
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-llm = genai.GenerativeModel("gemini-2.5-flash")  # check current model name
+llm = genai.GenerativeModel("gemini-3.8-flash")  # check current model name
 
 def retrieve(q, k=5):
     qv = next(iter(embedder.query_embed(q)))
