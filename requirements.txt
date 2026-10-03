@@ -2,4 +2,4 @@ flask
 gunicorn
 fastembed
 numpy
-google-generativeai
+google-genai
