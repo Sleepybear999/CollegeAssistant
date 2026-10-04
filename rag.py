@@ -3,19 +3,34 @@ import json, os, numpy as np
 from fastembed import TextEmbedding
 from google import genai
 
-rows = [json.loads(l) for l in open("chunks_final.jsonl", encoding="utf-8") if l.strip()]
+def _fix(s):
+    """Repair UTF-8 text that was mis-decoded as latin-1 (e.g. 'à¤¸' -> Devanagari)."""
+    if isinstance(s, str) and ("Ã" in s or "à" in s):
+        try:
+            return s.encode("latin-1").decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
+    return s
+
+rows = []
+for l in open("chunks_final.jsonl", encoding="utf-8"):
+    if l.strip():
+        d = json.loads(l)
+        d["title"], d["text"] = _fix(d.get("title", "")), _fix(d.get("text", ""))
+        rows.append(d)
 vecs = np.load("vectors.npy")
 assert len(rows) == len(vecs), "chunks and vectors are out of sync"
 
 embedder = TextEmbedding("BAAI/bge-small-en-v1.5")
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-MODEL = "gemini-3.5-flash-lite"  # check current model name
+MODEL = "gemini-3.5-flash-lite"
 
 def retrieve(q, k=5):
     qv = next(iter(embedder.query_embed(q)))
     qv = qv / np.linalg.norm(qv)
-    idx = np.argsort(vecs @ qv)[-k:][::-1]
-    return [rows[i] for i in idx]
+    sims = vecs @ qv
+    idx = np.argsort(sims)[-k:][::-1]
+    return [{**rows[i], "score": float(sims[i])} for i in idx]
 
 def rewrite(history, q):
     """Turn a follow-up into a standalone search query using recent chat history."""
@@ -23,10 +38,11 @@ def rewrite(history, q):
         return q
     convo = "\n".join(f"{m['role']}: {m['text'][:300]}" for m in history[-6:])
     prompt = (
-        "Rewrite the user's last message as one standalone search query for a college (NIT Jalandhar) "
-        "assistant, using the conversation for context. Expand abbreviations (e.g. DBMS -> database management "
-        "system). If they want exam papers, write it like: '<full subject name> <mid sem|end sem> paper <year>'. "
-        "Keep every detail they mentioned. Output only the rewritten query, nothing else.\n\n"
+        "Rewrite the user's last message as one standalone search query, using the conversation only to fill "
+        "in what it refers to. Fix spelling mistakes. Never drop any word the user wrote and never add place or "
+        "institute names. Expand abbreviations (e.g. DBMS -> database management system). If they want exam "
+        "papers, write it like: '<subject> <mid sem|end sem> paper <year>'. "
+        "Output only the rewritten query, nothing else.\n\n"
         f"Conversation:\n{convo}\nuser: {q}\n\nRewritten query:"
     )
     try:
