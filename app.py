@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory
-from rag import answer, retrieve
+from rag import answer, rewrite
 from pyq import search_papers
 
 app = Flask(__name__, static_folder=None)
@@ -14,15 +14,21 @@ def health():
 
 @app.post("/ask")
 def ask():
-    q = (request.get_json(silent=True) or {}).get("question", "").strip()
+    body = request.get_json(silent=True) or {}
+    q = body.get("question", "").strip()
+    history = [m for m in body.get("history", []) if isinstance(m, dict) and m.get("role") and m.get("text")][-6:]
     if not q:
         return jsonify(error="question is required"), 400
     try:
-        papers = search_papers(q)
+        standalone = rewrite(history, q)          # resolves "what about end sem?" etc.
+        papers = search_papers(standalone)
+        if papers is None and standalone != q:
+            papers = search_papers(q)
         if papers is not None:
             return jsonify(answer=papers["message"], groups=papers["groups"])
-        sources = [{"title": h["title"], "url": h["url"], "date": h["date"]} for h in retrieve(q, 5)]
-        return jsonify(answer=answer(q), sources=sources)
+        text, hits = answer(standalone, history)
+        sources = [{"title": h["title"], "url": h["url"], "date": h["date"]} for h in hits]
+        return jsonify(answer=text, sources=sources)
     except Exception as e:
         return jsonify(error=str(e)), 500
 
