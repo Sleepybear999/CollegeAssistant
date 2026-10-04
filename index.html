@@ -23,12 +23,17 @@
   input { flex:1; padding:12px 14px; font-size:16px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); outline:none; }
   button { padding:0 18px; font-size:16px; border:0; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; }
   button:disabled { opacity:.5; }
+  .grp { margin-top:12px; }
+  .grp h4 { margin:0 0 6px; font-size:14px; }
+  .grp h4 span { color:var(--muted); font-weight:400; font-size:12px; }
+  .paper { display:block; padding:8px 10px; margin-bottom:6px; border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--text); font-size:13px; line-height:1.4; }
+  .paper b { color:var(--accent); }
   .hint { color:var(--muted); text-align:center; margin-top:30px; font-size:14px; }
 </style>
 </head>
 <body>
 <header>NITJ Assistant</header>
-<div id="chat"><div class="hint">Ask anything about NIT Jalandhar.</div></div>
+<div id="chat"><div class="hint">Ask about NIT Jalandhar, or search papers like “DBMS mid sem paper”.</div></div>
 <form id="f">
   <input id="q" placeholder="Type your question..." autocomplete="off" required>
   <button id="b">Ask</button>
@@ -59,6 +64,20 @@ f.addEventListener("submit", async (e) => {
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Request failed");
     bot.textContent = data.answer;
+    (data.groups || []).forEach(g => {
+      const box = document.createElement("div"); box.className = "grp";
+      const t = document.createElement("h4"); t.textContent = g.subject + " ";
+      const c = document.createElement("span"); c.textContent = g.code; t.appendChild(c);
+      box.appendChild(t);
+      g.papers.forEach(p => {
+        const a = document.createElement("a"); a.className = "paper";
+        a.href = p.url; a.target = "_blank"; a.rel = "noopener";
+        const b = document.createElement("b"); b.textContent = "Open PDF ↗";
+        a.append(b, document.createElement("br"), p.label);
+        box.appendChild(a);
+      });
+      bot.appendChild(box);
+    });
     const links = (data.sources || []).filter(s => s.url);
     if (links.length) {
       const s = document.createElement("div");

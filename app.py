@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from rag import answer, retrieve
+from pyq import search_papers
 
 app = Flask(__name__, static_folder=None)
 
@@ -17,6 +18,9 @@ def ask():
     if not q:
         return jsonify(error="question is required"), 400
     try:
+        papers = search_papers(q)
+        if papers is not None:
+            return jsonify(answer=papers["message"], groups=papers["groups"])
         sources = [{"title": h["title"], "url": h["url"], "date": h["date"]} for h in retrieve(q, 5)]
         return jsonify(answer=answer(q), sources=sources)
     except Exception as e:
