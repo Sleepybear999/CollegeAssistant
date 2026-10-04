@@ -2,104 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NITJ Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f1f">
+<title>College Guide</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3c5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M32 14l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#f6f7f9; --card:#fff; --text:#1c1e21; --muted:#6b7280; --accent:#2563eb; --user:#2563eb; --border:#e5e7eb; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#111317; --card:#1b1e24; --text:#e8eaed; --muted:#9aa0a6; --accent:#60a5fa; --user:#2563eb; --border:#2c3038; }
-  }
-  * { box-sizing:border-box; }
-  html, body { height:100%; margin:0; }
-  body { font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
-  header { padding:14px 16px; border-bottom:1px solid var(--border); background:var(--card); font-weight:600; }
-  #chat { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; max-width:760px; width:100%; margin:0 auto; }
-  .msg { padding:10px 14px; border-radius:14px; max-width:88%; line-height:1.5; white-space:pre-wrap; word-wrap:break-word; }
-  .user { align-self:flex-end; background:var(--user); color:#fff; border-bottom-right-radius:4px; }
-  .bot { align-self:flex-start; background:var(--card); border:1px solid var(--border); border-bottom-left-radius:4px; }
-  .src { margin-top:8px; font-size:12px; color:var(--muted); }
-  .src a { color:var(--accent); text-decoration:none; }
-  form { display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--border); background:var(--card); max-width:760px; width:100%; margin:0 auto; }
-  input { flex:1; padding:12px 14px; font-size:16px; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--text); outline:none; }
-  button { padding:0 18px; font-size:16px; border:0; border-radius:10px; background:var(--accent); color:#fff; font-weight:600; }
-  button:disabled { opacity:.5; }
-  .grp { margin-top:12px; }
-  .grp h4 { margin:0 0 6px; font-size:14px; }
-  .grp h4 span { color:var(--muted); font-weight:400; font-size:12px; }
-  .paper { display:block; padding:8px 10px; margin-bottom:6px; border:1px solid var(--border); border-radius:10px; text-decoration:none; color:var(--text); font-size:13px; line-height:1.4; }
-  .paper b { color:var(--accent); }
-  .hint { color:var(--muted); text-align:center; margin-top:30px; font-size:14px; }
+:root{
+  --bg:#0d0f1f; --surface:#161935; --line:rgba(255,255,255,.09);
+  --text:#eef0ff; --muted:#9aa0c8;
+  --a:#7c5cff; --b:#22d3c5;
+  --grad:linear-gradient(135deg,var(--a),var(--b));
+  --user:linear-gradient(135deg,#6f50f5,#2a9fd6);
+}
+@media (prefers-color-scheme:light){
+  :root{--bg:#f6f7fd;--surface:#fff;--line:rgba(20,24,60,.09);--text:#161935;--muted:#6a7094;
+    --user:linear-gradient(135deg,#7c5cff,#22b5c9)}
+}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{
+  font-family:'Sora',system-ui,-apple-system,sans-serif;color:var(--text);
+  background:
+    radial-gradient(60rem 30rem at 10% -10%,rgba(124,92,255,.22),transparent 60%),
+    radial-gradient(50rem 28rem at 100% 0%,rgba(34,211,197,.16),transparent 60%),
+    var(--bg);
+  display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);
+}
+header{display:flex;align-items:center;gap:.7rem;padding:.9rem 1.25rem;max-width:760px;width:100%;margin:0 auto}
+header svg{width:34px;height:34px;flex:none}
+header b{font-weight:600;font-size:1.02rem;letter-spacing:.01em}
+#chat{flex:1;overflow-y:auto;padding:0 1.25rem 1rem;scroll-behavior:smooth}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem}
+
+.hero{text-align:center;padding:12vh 0 1rem}
+.hero svg{width:84px;height:84px;filter:drop-shadow(0 12px 30px rgba(124,92,255,.45))}
+.hero h1{font-weight:300;font-size:clamp(1.7rem,6vw,2.4rem);margin-top:1.2rem;line-height:1.2}
+.hero h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:600}
+.hero p{color:var(--muted);margin-top:.6rem;font-size:.95rem}
+
+.msg{max-width:88%;padding:.75rem 1rem;border-radius:18px;line-height:1.6;font-size:.95rem;white-space:pre-wrap;word-wrap:break-word}
+.msg.user{align-self:flex-end;background:var(--user);color:#fff;border-bottom-right-radius:6px}
+.msg.bot{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg a{color:var(--b);text-underline-offset:3px}
+.msg.user a{color:#fff}
+.dots{display:inline-flex;gap:5px;padding:.2rem 0}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--grad);animation:p 1.1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes p{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+form{padding:.6rem 1.25rem calc(.9rem + env(safe-area-inset-bottom,0px))}
+.bar{max-width:760px;margin:0 auto;display:flex;align-items:flex-end;gap:.5rem;background:var(--surface);
+  border:1px solid var(--line);border-radius:22px;padding:.45rem .45rem .45rem 1.1rem;transition:border-color .2s,box-shadow .2s}
+.bar:focus-within{border-color:var(--a);box-shadow:0 0 0 4px rgba(124,92,255,.15)}
+textarea{flex:1;font:inherit;font-size:.95rem;color:var(--text);background:none;border:0;outline:0;resize:none;
+  max-height:140px;padding:.55rem 0;line-height:1.4}
+textarea::placeholder{color:var(--muted)}
+button.send{width:42px;height:42px;border:0;border-radius:50%;background:var(--grad);cursor:pointer;display:grid;place-items:center;flex:none;transition:transform .15s,opacity .2s}
+button.send:active{transform:scale(.92)}
+button.send:disabled{opacity:.45}
+button.send svg{width:18px;height:18px}
+:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header>NITJ Assistant</header>
-<div id="chat"><div class="hint">Ask about NIT Jalandhar, or search papers like “DBMS mid sem paper”.</div></div>
-<form id="f">
-  <input id="q" placeholder="Type your question..." autocomplete="off" required>
-  <button id="b">Ask</button>
-</form>
-<script>
-const chat = document.getElementById("chat"), f = document.getElementById("f"),
-      q = document.getElementById("q"), b = document.getElementById("b");
-const history = [];
 
-function add(cls, text) {
-  const d = document.createElement("div");
-  d.className = "msg " + cls;
-  d.textContent = text;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-  return d;
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c5cff"/><stop offset="1" stop-color="#22d3c5"/>
+    </linearGradient>
+    <symbol id="logo" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="18" fill="url(#lg)"/>
+      <path d="M32 12l5.2 14.8L52 32l-14.8 5.2L32 52l-5.2-14.8L12 32l14.8-5.2z" fill="#fff"/>
+      <circle cx="32" cy="32" r="3.6" fill="url(#lg)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <svg><use href="#logo"/></svg>
+  <b>College Guide</b>
+</header>
+
+<main id="chat"><div class="wrap" id="log">
+  <section class="hero" id="hero">
+    <svg><use href="#logo"/></svg>
+    <h1>Ask anything about your <span>college</span></h1>
+  </section>
+</div></main>
+
+<form id="form">
+  <div class="bar">
+    <textarea id="q" rows="1" placeholder="Ask a question" aria-label="Your question"></textarea>
+    <button class="send" id="send" aria-label="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+</form>
+
+<script>
+const API = '/chat';            // change to your Flask route
+const FIELD = 'message';        // JSON key your backend expects
+
+const log = document.getElementById('log'), chat = document.getElementById('chat'),
+      q = document.getElementById('q'), send = document.getElementById('send');
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function fmt(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/(^|[\s(])(https?:\/\/[^\s)<]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+}
+function add(cls, html){
+  const d = document.createElement('div'); d.className = 'msg ' + cls; d.innerHTML = html;
+  log.appendChild(d); chat.scrollTop = chat.scrollHeight; return d;
 }
 
-f.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const question = q.value.trim();
-  if (!question) return;
-  chat.querySelector(".hint")?.remove();
-  add("user", question);
-  q.value = ""; b.disabled = true;
-  const bot = add("bot", "Thinking...");
-  try {
-    const r = await fetch("/ask", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({question, history:history.slice(-6)}) });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error || "Request failed");
-    bot.textContent = data.answer;
-    history.push({role:"user", text:question}, {role:"assistant", text:data.answer});
-    (data.groups || []).forEach(g => {
-      const box = document.createElement("div"); box.className = "grp";
-      const t = document.createElement("h4"); t.textContent = g.subject + " ";
-      const c = document.createElement("span"); c.textContent = g.code; t.appendChild(c);
-      box.appendChild(t);
-      g.papers.forEach(p => {
-        const a = document.createElement("a"); a.className = "paper";
-        a.href = p.url; a.target = "_blank"; a.rel = "noopener";
-        const b = document.createElement("b"); b.textContent = "Open PDF ↗";
-        a.append(b, document.createElement("br"), p.label);
-        box.appendChild(a);
-      });
-      bot.appendChild(box);
-    });
-    const links = (data.sources || []).filter(s => s.url);
-    if (links.length) {
-      const s = document.createElement("div");
-      s.className = "src";
-      s.append("Sources: ");
-      links.slice(0, 3).forEach((x, i) => {
-        if (i) s.append(" · ");
-        const a = document.createElement("a");
-        a.href = x.url; a.target = "_blank"; a.rel = "noopener";
-        a.textContent = x.title || x.url;
-        s.append(a);
-      });
-      bot.appendChild(s);
-    }
-  } catch (err) {
-    bot.textContent = "Error: " + err.message + ". If the server was asleep, wait a minute and try again.";
+async function ask(text){
+  text = text.trim(); if(!text) return;
+  document.getElementById('hero')?.remove();
+  add('user', esc(text)); q.value = ''; q.style.height = 'auto'; send.disabled = true;
+  const wait = add('bot', '<span class="dots"><i></i><i></i><i></i></span>');
+  try{
+    const r = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({[FIELD]:text})});
+    if(!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    wait.innerHTML = fmt(d.answer || d.reply || d.response || 'No answer came back. Try rephrasing your question.');
+  }catch(e){
+    wait.innerHTML = 'Could not reach the server. If it was idle, it may still be waking up. Try again in a few seconds.';
   }
-  b.disabled = false; q.focus();
-  chat.scrollTop = chat.scrollHeight;
-});
+  send.disabled = false; chat.scrollTop = chat.scrollHeight;
+}
+
+document.getElementById('form').addEventListener('submit',e=>{e.preventDefault();ask(q.value)});
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask(q.value)}});
+q.addEventListener('input',()=>{q.style.height='auto';q.style.height=q.scrollHeight+'px'});
 </script>
 </body>
 </html>
